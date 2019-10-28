@@ -1,6 +1,7 @@
 import cv2
 import time
-
+import numpy as np
+import pickle
 
 def detect(im):
 	start_time = time.time()
@@ -12,9 +13,9 @@ def detect(im):
 
 	# ================== HOG Detector========================
 	hog = cv2.HOGDescriptor()
-	# svm = pickle.load(open("svm.pkl"))
-	# hog.setSVMDetector(svm)
-	hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
+	svm = pickle.load(open("./detection/aniruddh/svm.pkl", 'rb'))
+	hog.setSVMDetector(np.array(svm))
+	# hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
 	rects, weights = hog.detectMultiScale(gray_im)
 
 	end_time = time.time()

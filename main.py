@@ -23,6 +23,8 @@ for i in range(5):
 	cv2.destroyAllWindows()
 
 # Ground truth boxes
+# im_path = data_dir + game_name + '/' + clip_name + '/' + '{:02}.png'.format(img_num)
+# im = cv2.imread(im_path)
 # bb_path = data_dir + game_name + '/' + clip_name + '/' + '{:02}_info.csv'.format(img_num)
 # bbs_data = pd.read_csv(bb_path)
 # for _, bbox in bbs_data.iterrows():
