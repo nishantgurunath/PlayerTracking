@@ -18,6 +18,11 @@ upper_red = np.array([176,255,255])
 lower_white = np.array([0,0,0])
 upper_white = np.array([0,0,255])
 
+def detect(image):
+	hsv = cv2.cvtColor(image,cv2.COLOR_BGR2HSV)
+	lower, upper, view = get_dominant(hsv)
+	return get_bbox(hsv, lower, upper)
+
 def cluster(image, K):
 	hsv = cv2.cvtColor(image,cv2.COLOR_BGR2HSV)
 	Z = hsv.reshape((-1,3))
@@ -50,7 +55,7 @@ def get_dominant(hsv):
 def get_playable(hsv):
 	hsv = cv2.cvtColor(image,cv2.COLOR_BGR2HSV)
 
-def detect(hsv, lower, upper):
+def get_bbox(hsv, lower, upper):
     # applying mask and get grayscale
 	mask = cv2.inRange(hsv, lower, upper)
 	res = cv2.bitwise_and(hsv, hsv, mask=mask)
@@ -64,7 +69,7 @@ def detect(hsv, lower, upper):
 	# cv2.imshow('Threshold', thresh)
 	kernel = np.ones((13,13),np.uint8)
 	thresh = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
-	cv2.imshow('morphology', thresh)
+	# cv2.imshow('morphology', thresh)
 
     #find contours in threshold image  
 	contours,hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -78,7 +83,7 @@ def detect(hsv, lower, upper):
 		# 	if(w>15 and h>= 15):
 		area = w * h
 		if (100 < area < 15000 and h > 50):
-				bbox.append([x,y,w,h])
+			bbox.append([x,y,w,h])
 	return np.array(bbox)
 
 def clf_team(bbox, image):
@@ -120,15 +125,15 @@ def main():
 		lower, upper, view = get_dominant(hsv)
 
 		# if view == 0: continue
-		bboxes = detect(hsv, lower, upper)
+		bboxes = get_bbox(hsv, lower, upper)
 		for bbox in bboxes:
 			clf_team(bbox, image)
 		
 		count += 1
-		# cv2.imshow('Match Detection',image)
+		cv2.imshow('Match Detection',image)
 
 		# cv2.imshow('Match Detection', cluster(image, 2))
-		time.sleep(0.05)
+		# time.sleep(0.05)
 		if cv2.waitKey(1) & 0xFF == ord('q'): break
 	    
 	cv2.destroyAllWindows()
