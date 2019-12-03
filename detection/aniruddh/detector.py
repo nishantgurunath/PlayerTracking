@@ -72,7 +72,7 @@ def get_bbox(hsv, lower, upper):
 	# cv2.imshow('morphology', thresh)
 
     #find contours in threshold image  
-	contours,hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+	_, contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 	# cv2.drawContours(image, contours, -1, (0,255,0), 2)
 	# cv2.imshow('contours', image)
 
@@ -84,7 +84,7 @@ def get_bbox(hsv, lower, upper):
 		area = w * h
 		if (100 < area < 15000 and h > 50):
 			team_id = clf_team([x,y,w,h], hsv)
-			ans.append([x,y,w,h, team_idid])
+			ans.append([x,y,w,h, team_id])
 	return np.array(ans)
 
 def clf_team(bbox, image):
@@ -119,7 +119,7 @@ def clf_team(bbox, image):
 def main():
 	#Read the video frame by frame
 	for count in range(50,800):
-		impath = datapath+'pano/%d.png' % (count)
+		impath = datapath+'frames/%d.png' % (count)
 		image = cv2.imread(impath)
 
 		hsv = cv2.cvtColor(image,cv2.COLOR_BGR2HSV)
@@ -127,8 +127,9 @@ def main():
 
 		# if view == 0: continue
 		bboxes = get_bbox(hsv, lower, upper)
-		for bbox in bboxes:
-			clf_team(bbox, image)
+		print (bboxes)
+		# for bbox in bboxes:
+		# 	clf_team(bbox, image)
 		
 		count += 1
 		cv2.imshow('Match Detection',image)
