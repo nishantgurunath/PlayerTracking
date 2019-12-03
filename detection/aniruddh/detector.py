@@ -72,19 +72,20 @@ def get_bbox(hsv, lower, upper):
 	# cv2.imshow('morphology', thresh)
 
     #find contours in threshold image  
-	contours,hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+	_, contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 	# cv2.drawContours(image, contours, -1, (0,255,0), 2)
 	# cv2.imshow('contours', image)
 
-	bbox = []
+	ans = []
 	for c in contours:
 		x,y,w,h = cv2.boundingRect(c)
 		# if(h>=(1.5)*w):
 		# 	if(w>15 and h>= 15):
 		area = w * h
 		if (100 < area < 15000 and h > 50):
-			bbox.append([x,y,w,h])
-	return np.array(bbox)
+			team_id = clf_team([x,y,w,h], hsv)
+			ans.append([x,y,w,h, team_id])
+	return np.array(ans)
 
 def clf_team(bbox, image):
 	font = cv2.FONT_HERSHEY_SIMPLEX
@@ -107,17 +108,17 @@ def clf_team(bbox, image):
 	nzCountred = cv2.countNonZero(res2)
 	if(nzCount > nzCountred):
 		# cv2.putText(image, 'France', (x-2, y-2), font, 0.8, (255,0,0), 2, cv2.LINE_AA)
-		cv2.rectangle(image,(x,y),(x+w,y+h),(255,0,0),3)
-
+		# cv2.rectangle(image,(x,y),(x+w,y+h),(255,0,0),3)
+		return 0
 	else:
 		# cv2.putText(image, 'Belgium', (x-2, y-2), font, 0.8, (0,0,255), 2, cv2.LINE_AA)
-		cv2.rectangle(image,(x,y),(x+w,y+h),(0,0,255),3)
-	
+		# cv2.rectangle(image,(x,y),(x+w,y+h),(0,0,255),3)
+		return 1
 
 
 def main():
 	#Read the video frame by frame
-	for count in range(800):
+	for count in range(50,800):
 		impath = datapath+'frames/%d.png' % (count)
 		image = cv2.imread(impath)
 
@@ -126,8 +127,9 @@ def main():
 
 		# if view == 0: continue
 		bboxes = get_bbox(hsv, lower, upper)
-		for bbox in bboxes:
-			clf_team(bbox, image)
+		print (bboxes)
+		# for bbox in bboxes:
+		# 	clf_team(bbox, image)
 		
 		count += 1
 		cv2.imshow('Match Detection',image)
